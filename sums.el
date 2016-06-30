@@ -18,6 +18,7 @@
 
 (sum '(1 2 3 4 5))
 
+
 (defun sum2-aux (numbers acc)
   "Auxiliar for better recursive sum with tail recursion"
   (if (eq nil numbers)
@@ -29,3 +30,13 @@
   (sum2-aux numbers 0))
 
 (sum2 '(1 2 3 4 5))
+
+
+(defun sum3 (numbers)
+  "Using pattern matching"
+  (pcase numbers
+    (`nil 0)
+    (`(,first . ,_) (+ first (sum3 (cdr numbers))))))
+
+
+(sum3 '(1 2 3 4 5))
