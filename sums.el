@@ -55,9 +55,9 @@
   "Simple implementation of well-known form reduce"
   (pcase elements
     (`nil acc)
-    (`(,first . ,_) (let ((elements-left (cdr elements))
-                          (new-acc       (apply fun (list first acc))))
-                      (reduce fun new-acc elements-left)))))
+    (`(,first . ,elements-left)
+     (let ((new-acc (apply fun (list first acc))))
+       (reduce fun new-acc elements-left)))))
 
 (defun add (a b)
   (+ a b))
@@ -65,16 +65,16 @@
 (add 3 3)
 
 (reduce 'add 0 '(3 3))
-(reduce 'add 0 (number-sequence 1 8))
-
+(eq (reduce 'add 0 (number-sequence 1 8))
+    36)
 
 (defun reduce2 (fun acc elements)
   "Implementation of reduce as in the article"
   (pcase elements
     (`nil acc)
-    (`(,first . ,_) (let ((elements-left (cdr elements)))
-                      (let ((result (reduce fun acc elements-left)))
-                           (apply fun (list first result)))))))
+    (`(,first . ,elements-left)
+     (let ((result (reduce fun acc elements-left)))
+       (apply fun (list first result))))))
 
 (reduce2 'add 0 '(3 3))
 (reduce2 'add 0 (number-sequence 1 8))
@@ -97,3 +97,41 @@
 
 (map 'double '(3 5 20))
 (map 'double (number-sequence 2 6))
+
+(list 'node 1 (cons (list 'node 2 nil)
+               (cons (list 'node 3 nil)
+                     nil)))
+
+(print (symbol-function (car (read-from-string "+"))))
+
+(apply (symbol-function (car (read-from-string "+"))) '(1 2))
+
+(quote quote)
+
+(apply (quote add) (quote (1 2)))
+
+
+(defmacro from-seq (binding-names source-seq &rest body)
+  (let ((head-var (car binding-names))
+        (tail-var (car (cdr binding-names))))
+    `(let ((,head-var (car ,source-seq))
+           (,tail-var (cdr ,source-seq)))
+       ,@body)))
+
+(print (macroexpand '(from-seq (head tail) '(1 2 3)
+                                 (print head))))
+
+(from-seq (head tail) '(1 2 3)
+          (progn (print head)
+                 (print tail)))
+
+
+(defun reduce-new (fun acc elements)
+  "reduce using new macro"
+  (if (eq nil elements)
+      acc
+    (from-seq (head tail) elements
+              (let ((new-acc (apply fun (list head acc))))
+                (reduce fun new-acc tail)))))
+
+(reduce-new 'add 0 (number-sequence 1 8))
