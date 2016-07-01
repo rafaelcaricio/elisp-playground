@@ -73,7 +73,7 @@
   (pcase elements
     (`nil acc)
     (`(,first . ,elements-left)
-     (let ((result (reduce fun acc elements-left)))
+     (let ((result (reduce2 fun acc elements-left)))
        (apply fun (list first result))))))
 
 (reduce2 'add 0 '(3 3))
@@ -132,6 +132,8 @@
       acc
     (from-seq (head tail) elements
               (let ((new-acc (apply fun (list head acc))))
-                (reduce fun new-acc tail)))))
+                (reduce-new fun new-acc tail)))))
 
 (reduce-new 'add 0 (number-sequence 1 8))
+
+(print (cdr (assoc 'name '((name . "Rafael") (abc . 1)))))
