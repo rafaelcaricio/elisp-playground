@@ -137,3 +137,58 @@
 (reduce-new 'add 0 (number-sequence 1 8))
 
 (print (cdr (assoc 'name '((name . "Rafael") (abc . 1)))))
+
+(defmacro node (label child)
+  `(list 'node ,label ,child))
+
+(print (macroexpand '(node 1 (cons (node 2 nil) nil))))
+
+(node 1 (cons (node 2 nil)
+              (cons (node 3 nil)
+                    nil)))
+
+(defun right-child (tree-node)
+  (car (car (cdr (cdr tree-node)))))
+
+(defun left-child (tree-node)
+  (car (cdr (car (cdr (cdr tree-node))))))
+
+(right-child (node 1 nil))
+
+(right-child (node 2 (cons (node 3 nil) nil)))
+
+(right-child (node 2 (cons (node 3 nil)
+                           (cons (node 2 nil) nil))))
+
+(left-child (node 2 (cons (node 3 nil)
+                           (cons (node 2 nil) nil))))
+
+(defun binary-tree (label &optional base-tree)
+  (if base-tree
+      (let ((root-label (car (cdr base-tree)))
+            (right-child-node (right-child base-tree))
+            (left-child-node (left-child base-tree)))
+        (if (> label root-label)
+          (node root-label (cons (binary-tree label right-child-node)
+                                 (cons left-child-node nil)))
+          (node root-label (cons right-child-node
+                                 (cons (binary-tree label left-child-node) nil)))))
+      (node label nil)))
+
+(binary-tree 1)
+
+(binary-tree 2 (binary-tree 1))
+
+(binary-tree 1 (binary-tree 2))
+
+(binary-tree 3 (binary-tree 1 (binary-tree 2)))
+
+(print (binary-tree 4 (binary-tree 3 (binary-tree 1 (binary-tree 2)))))
+
+(print (binary-tree 4 (binary-tree 5)))
+
+(print (binary-tree 3 (binary-tree 2 (binary-tree 1 (binary-tree 4 (binary-tree 5))))))
+
+(print (binary-tree 9 (binary-tree 11 (binary-tree 5 (binary-tree 7 (binary-tree 10 (binary-tree 6 (binary-tree 8))))))))
+
+(print (reduce-new 'binary-tree (binary-tree 8) '(6 10 7 5 9 11)))
