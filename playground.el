@@ -191,4 +191,4 @@
 
 (print (binary-tree 9 (binary-tree 11 (binary-tree 5 (binary-tree 7 (binary-tree 10 (binary-tree 6 (binary-tree 8))))))))
 
-(print (reduce-new 'binary-tree (binary-tree 8) '(6 10 7 5 9 11)))
+(print (reduce-new 'binary-tree nil '(8 6 10 7 5 9 11)))
