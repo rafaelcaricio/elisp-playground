@@ -194,3 +194,34 @@
 (print (binary-tree 9 (binary-tree 11 (binary-tree 5 (binary-tree 7 (binary-tree 10 (binary-tree 6 (binary-tree 8))))))))
 
 (print (reduce-new 'binary-tree nil '(8 6 10 7 5 9 11)))
+
+
+(defmacro partial-apply (orig-fun-ref &optional partial-arg-list)
+  "Applies partially the arguments to a function.
+
+Limitations:
+- Does not support lambda functions as orig-fun-ref;
+- May mess arguments with orig-fun if using pattern _i[0-9]+ for argument name in orig-fun (dynamic context)."
+  (let* ((orig-fun (symbol-function (cadr orig-fun-ref)))
+         (orig-fun-arity (length (cadr orig-fun)))
+         (provided-args (cadr partial-arg-list))
+         (n-provided-args (length provided-args))
+         (n-missing-args (- orig-fun-arity n-provided-args))
+         (missing-args (mapcar 'make-symbol
+                               (mapcar (lambda (i) (concat "_i" (int-to-string i)))
+                                       (number-sequence 1 n-missing-args))))
+         (final-call-args (cons 'list (append provided-args missing-args))))
+    `(lambda ,missing-args (apply ,orig-fun ,final-call-args))))
+
+(print (macroexpand
+        (partial-apply 'add '(1))))
+
+(partial-apply 'add '(1))
+
+(apply (partial-apply 'add '(1)) '(1))
+
+(funcall (partial-apply 'add '(1)) 1)
+
+(funcall (symbol-function 'add) 1 2)
+
+(add 2 3)
