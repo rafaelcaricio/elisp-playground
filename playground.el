@@ -148,10 +148,10 @@
                     nil)))
 
 (defun right-child (tree-node)
-  (car (car (cdr (cdr tree-node)))))
+  (caaddr tree-node))
 
 (defun left-child (tree-node)
-  (car (cdr (car (cdr (cdr tree-node))))))
+  (cadadr (cdr tree-node)))
 
 (right-child (node 1 nil))
 
@@ -165,14 +165,16 @@
 
 (defun binary-tree (label &optional base-tree)
   (if base-tree
-      (let ((root-label (car (cdr base-tree)))
+      (let ((root-label       (cadr base-tree))
             (right-child-node (right-child base-tree))
-            (left-child-node (left-child base-tree)))
+            (left-child-node  (left-child base-tree)))
         (if (> label root-label)
-          (node root-label (cons (binary-tree label right-child-node)
-                                 (cons left-child-node nil)))
-          (node root-label (cons right-child-node
-                                 (cons (binary-tree label left-child-node) nil)))))
+            (node root-label
+                  (list
+                   (binary-tree label right-child-node) left-child-node))
+            (node root-label
+                  (list
+                   right-child-node (binary-tree label left-child-node)))))
       (node label nil)))
 
 (binary-tree 1)
